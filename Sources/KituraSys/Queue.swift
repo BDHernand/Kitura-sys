@@ -53,7 +53,7 @@ public class Queue {
     /// 
     /// - Parameter block: a closure () -> Void  
     ///
-    public func queueAsync(_ block: () -> Void) {
+    public func queueAsync(block: () -> Void) {
         dispatch_async(osQueue, block)
     }
 
@@ -62,7 +62,7 @@ public class Queue {
     ///
     /// - Parameter block: a closure () -> Void
     ///
-    public func queueSync(_ block: () -> Void) {
+    public func queueSync(block: () -> Void) {
         dispatch_sync(osQueue, block)
     }
     
