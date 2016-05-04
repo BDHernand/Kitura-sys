@@ -33,12 +33,12 @@ public class StringUtils {
     /// 
     /// - Returns: NSData?
     ///
-    public static func toUtf8String(str: String) -> NSData? {
+    public static func toUtf8String(_ str: String) -> NSData? {
         let nsstr:NSString = str.bridge()
         #if os(Linux)
         let data = nsstr.dataUsingEncoding(NSUTF8StringEncoding)
         #else
-        let data = nsstr.data(usingEncoding: NSUTF8StringEncoding)
+        let data = nsstr.data(using: NSUTF8StringEncoding)
         #endif
         return data
     }
@@ -51,14 +51,14 @@ public class StringUtils {
     ///
     /// - Returns: NSData?
     ///
-    public static func toNullTerminatedUtf8String(str: String) -> NSData? {
+    public static func toNullTerminatedUtf8String(_ str: String) -> NSData? {
         let nsstr:NSString = str.bridge()
         #if os(Linux)
         let cString = nsstr.cStringUsingEncoding(NSUTF8StringEncoding)        
         #else
-        let cString = nsstr.cString(usingEncoding: NSUTF8StringEncoding)
+        let cString = nsstr.cString(using: NSUTF8StringEncoding)
         #endif
-        let data = NSData(bytes: cString, length: Int(strlen(cString))+1)
+        let data = NSData(bytes: cString, length: Int(strlen(cString!))+1)
         return data
     }
     
@@ -70,7 +70,7 @@ public class StringUtils {
     ///
     /// - Returns: String?
     ///
-    public static func fromUtf8String(data: NSData) -> String? {
+    public static func fromUtf8String(_ data: NSData) -> String? {
         let str = NSString(data: data, encoding: NSUTF8StringEncoding)
         return str!.bridge()
     }
