@@ -19,39 +19,39 @@ import Dispatch
 // MARK: Queue
 
 public class Queue {
-    
-    /// 
+
+    ///
     /// Lock to ensure
     ///
     private static var onMainOnceLock : Int = 0
-    
+
     ///
     /// Handle to the libDispatch queue
     ///
     private let osQueue: dispatch_queue_t
-    
-    
+
+
     ///
     /// Initializes a Queue instance
     ///
-    /// - Parameter type:  QueueType (SERIAL or PARALLEL)
+    /// - Parameter type:  QueueType (serial or parallel)
     /// - Parameter label: Optional String describing the Queue
     ///
-    /// - Returns: Queue instance 
+    /// - Returns: Queue instance
     ///
     public init(type: QueueType, label: String?=nil) {
         let concurrent = DISPATCH_QUEUE_CONCURRENT
         let serial = DISPATCH_QUEUE_SERIAL
 
         osQueue = dispatch_queue_create(label != nil ? label! : "",
-            type == QueueType.PARALLEL ? concurrent : serial)
+            type == .parallel ? concurrent : serial)
     }
-    
-    
+
+
     ///
     /// Run a block asynchronously
-    /// 
-    /// - Parameter block: a closure () -> Void  
+    ///
+    /// - Parameter block: a closure () -> Void
     ///
     public func queueAsync(_ block: () -> Void) {
         dispatch_async(osQueue, block)
@@ -91,7 +91,7 @@ public class Queue {
 /// QueueType values
 ///
 public enum QueueType {
-    
-    case SERIAL, PARALLEL
-    
+
+    case serial, parallel
+
 }

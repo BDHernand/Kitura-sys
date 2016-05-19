@@ -35,12 +35,7 @@ public class StringUtils {
     ///
     public static func toUtf8String(_ str: String) -> NSData? {
         let nsstr:NSString = str.bridge()
-        #if os(Linux)
-        let data = nsstr.dataUsingEncoding(NSUTF8StringEncoding)
-        #else
-        let data = nsstr.data(using: NSUTF8StringEncoding)
-        #endif
-        return data
+        return nsstr.data(using: NSUTF8StringEncoding)
     }
     
     
@@ -53,13 +48,8 @@ public class StringUtils {
     ///
     public static func toNullTerminatedUtf8String(_ str: String) -> NSData? {
         let nsstr:NSString = str.bridge()
-        #if os(Linux)
-        let cString = nsstr.cStringUsingEncoding(NSUTF8StringEncoding)        
-        #else
         let cString = nsstr.cString(using: NSUTF8StringEncoding)
-        #endif
-        let data = NSData(bytes: cString, length: Int(strlen(cString!))+1)
-        return data
+        return NSData(bytes: cString, length: Int(strlen(cString!))+1)
     }
     
     
