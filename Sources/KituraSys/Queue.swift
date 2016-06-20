@@ -53,7 +53,7 @@ public class Queue {
     ///
     /// - Parameter block: a closure () -> Void
     ///
-    public func queueAsync(_ block: () -> Void) {
+    public func enqueueAsynchronously(_ block: () -> Void) {
         dispatch_async(osQueue, block)
     }
 
@@ -62,7 +62,7 @@ public class Queue {
     ///
     /// - Parameter block: a closure () -> Void
     ///
-    public func queueSync(_ block: () -> Void) {
+    public func enqueueSynchronously(_ block: () -> Void) {
         dispatch_sync(osQueue, block)
     }
     
@@ -73,7 +73,7 @@ public class Queue {
     /// - Parameter queue: Queue
     /// - Parameter block: a closure () -> Void 
     ///
-    public static func queueIfFirstOnMain(queue: Queue, block: () -> Void) {
+    public static func enqueueIfFirstOnMain(queue: Queue, block: () -> Void) {
         var onQueue = true
         
         SysUtils.doOnce(&onMainOnceLock) {
@@ -82,7 +82,7 @@ public class Queue {
         }
         
         if  onQueue {
-            queue.queueAsync(block)
+            queue.enqueueAsynchronously(block)
         }
     }
 }
