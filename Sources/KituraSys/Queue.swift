@@ -28,7 +28,7 @@ public class Queue {
     ///
     /// Handle to the libDispatch queue
     ///
-    private let osQueue: dispatch_queue_t
+    internal let osQueue: dispatch_queue_t
 
 
     ///
