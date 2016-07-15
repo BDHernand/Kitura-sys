@@ -23,9 +23,9 @@ public class Group {
     public init() {}
     
     #if os(Linux)
-        private let osGroup = dispatch_group_create()
+    private let osGroup = dispatch_group_create()
     #else
-        private let osGroup = dispatch_group_create()!
+    private let osGroup = DispatchGroup()
     #endif
     
     ///
@@ -34,25 +34,53 @@ public class Group {
     /// - Parameter block: a closure () -> Void
     ///
     public func enqueueAsynchronously(on queue: Queue, block: () -> Void) {
-        dispatch_group_async(osGroup, queue.osQueue, block)
+        #if os(Linux)
+            dispatch_group_async(osGroup, queue.osQueue, block)
+        #else
+            queue.osQueue.async(group: osGroup, execute: block)
+        #endif
     }
     
     ///
     /// Wait synchronously for asynchronous blocks to complete
     ///
     public func wait(for timeout: GroupTimeout) {
-        let osTimeout: dispatch_time_t
+        #if os(Linux)
+            let osTimeout: dispatch_time_t
+        #else
+            let osTimeout: DispatchTime
+        #endif
         switch(timeout) {
         case .ever:
-            osTimeout = DISPATCH_TIME_FOREVER
+            #if os(Linux)
+                osTimeout = DISPATCH_TIME_FOREVER
+            #else
+                osTimeout = DispatchTime.distantFuture
+            #endif
         case .seconds(let seconds):
-            osTimeout = dispatch_time(DISPATCH_TIME_NOW, seconds * Int64(NSEC_PER_SEC))
+            #if os(Linux)
+                osTimeout = dispatch_time(DISPATCH_TIME_NOW, seconds * Int64(NSEC_PER_SEC))
+            #else
+                osTimeout = DispatchTime.now() + DispatchTimeInterval.seconds(Int(seconds))
+            #endif
         case .milliSeconds(let milliSeconds):
-            osTimeout = dispatch_time(DISPATCH_TIME_NOW, milliSeconds * Int64(NSEC_PER_USEC))
+            #if os(Linux)
+                osTimeout = dispatch_time(DISPATCH_TIME_NOW, milliSeconds * Int64(NSEC_PER_USEC))
+            #else
+                osTimeout = DispatchTime.now() + DispatchTimeInterval.milliseconds(Int(milliSeconds))
+            #endif
         case .nanoSeconds(let nanoSeconds):
-            osTimeout = dispatch_time(DISPATCH_TIME_NOW, nanoSeconds)
+            #if os(Linux)
+                osTimeout = dispatch_time(DISPATCH_TIME_NOW, nanoSeconds)
+            #else
+                osTimeout = DispatchTime.now() + DispatchTimeInterval.nanoseconds(Int(nanoSeconds))
+            #endif
         }
-        dispatch_group_wait(osGroup, osTimeout)
+        #if os(Linux)
+            dispatch_group_wait(osGroup, osTimeout)
+        #else
+            _ = osGroup.wait(timeout: osTimeout)
+        #endif
     }
 }
 

@@ -19,18 +19,16 @@ import Dispatch
 // MARK: Queue
 
 public class Queue {
-
-    ///
-    /// Lock to ensure
-    ///
-    private static var onMainOnceLock : Int = 0
-
+    
     ///
     /// Handle to the libDispatch queue
     ///
+    #if os(Linux)
     public let osQueue: dispatch_queue_t
-
-
+    #else
+    public let osQueue: DispatchQueue
+    #endif
+    
     ///
     /// Initializes a Queue instance
     ///
@@ -40,50 +38,43 @@ public class Queue {
     /// - Returns: Queue instance
     ///
     public init(type: QueueType, label: String?=nil) {
-        let concurrent = DISPATCH_QUEUE_CONCURRENT
-        let serial = DISPATCH_QUEUE_SERIAL
-
-        osQueue = dispatch_queue_create(label != nil ? label! : "",
-            type == .parallel ? concurrent : serial)
+        #if os(Linux)
+            let concurrent = DISPATCH_QUEUE_CONCURRENT
+            let serial = DISPATCH_QUEUE_SERIAL
+            
+            osQueue = dispatch_queue_create(label != nil ? label! : "",
+                                            type == .parallel ? concurrent : serial)            
+        #else
+            osQueue =  DispatchQueue(label: label != nil ? label! : "",
+                                     attributes: type == .parallel ? [.concurrent] : [.serial])
+        #endif
     }
-
-
+    
+    
     ///
     /// Run a block asynchronously
     ///
     /// - Parameter block: a closure () -> Void
     ///
     public func enqueueAsynchronously(_ block: () -> Void) {
-        dispatch_async(osQueue, block)
+        #if os(Linux)
+            dispatch_async(osQueue, block)
+        #else
+            osQueue.async(execute: block)
+        #endif
     }
-
+    
     ///
     /// Run a block synchronously
     ///
     /// - Parameter block: a closure () -> Void
     ///
     public func enqueueSynchronously(_ block: () -> Void) {
-        dispatch_sync(osQueue, block)
-    }
-    
-    
-    /// 
-    /// Run a block once a main lock has been obtained
-    ///
-    /// - Parameter queue: Queue
-    /// - Parameter block: a closure () -> Void 
-    ///
-    public static func enqueueIfFirstOnMain(queue: Queue, block: () -> Void) {
-        var onQueue = true
-        
-        SysUtils.doOnce(&onMainOnceLock) {
-            dispatch_async(dispatch_get_main_queue(), block);
-            onQueue = false
-        }
-        
-        if  onQueue {
-            queue.enqueueAsynchronously(block)
-        }
+        #if os(Linux)
+            dispatch_sync(osQueue, block)
+        #else
+            osQueue.sync(execute: block)
+        #endif
     }
 }
 
@@ -91,7 +82,7 @@ public class Queue {
 /// QueueType values
 ///
 public enum QueueType {
-
+    
     case serial, parallel
-
+    
 }
