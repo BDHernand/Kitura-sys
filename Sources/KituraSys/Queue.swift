@@ -45,8 +45,12 @@ public class Queue {
             osQueue = dispatch_queue_create(label != nil ? label! : "",
                                             type == .parallel ? concurrent : serial)            
         #else
-            osQueue =  DispatchQueue(label: label != nil ? label! : "",
-                                     attributes: type == .parallel ? [.concurrent] : [.serial])
+            if type == .parallel {
+                osQueue = DispatchQueue(label: label != nil ? label! : "", attributes:  .concurrent)
+            }
+            else {
+                osQueue = DispatchQueue(label: label != nil ? label! : "")
+            }
         #endif
     }
     

@@ -27,54 +27,39 @@ import Foundation
 public class StringUtils {
     
     ///
-    /// Converts a Swift string to a UTF encoded NSData
+    /// Converts a Swift string to a UTF encoded Data
     ///
     /// - Parameter str: String
     ///
-    /// - Returns: NSData?
+    /// - Returns: Data?
     ///
-    public static func toUtf8String(_ str: String) -> NSData? {
-        let nsstr:NSString = str.bridge()
-        #if os(Linux)
-            return nsstr.data(using: NSUTF8StringEncoding)
-        #else
-            return nsstr.data(using: String.Encoding.utf8.rawValue)
-        #endif
+    public static func toUtf8String(_ str: String) -> Data? {
+        return str.data(using: String.Encoding.utf8)
     }
     
     
     ///
-    /// Converts a Swift string to a UTF encoded null terminated NSData
+    /// Converts a Swift string to a UTF encoded null terminated Data
     ///
     /// - Parameter str: String
     ///
-    /// - Returns: NSData?
+    /// - Returns: Data?
     ///
-    public static func toNullTerminatedUtf8String(_ str: String) -> NSData? {
-        let nsstr:NSString = str.bridge()
-        #if os(Linux)
-            let cString = nsstr.cString(using: NSUTF8StringEncoding)
-        #else
-            let cString = nsstr.cString(using: String.Encoding.utf8.rawValue)
-        #endif
-        return NSData(bytes: cString, length: Int(strlen(cString!))+1)
+    public static func toNullTerminatedUtf8String(_ str: String) -> Data? {
+        let cString = str.cString(using: String.Encoding.utf8)
+        return cString != nil ? Data(bytes: UnsafePointer<UInt8>(cString!), count: Int(strlen(cString!))+1) : nil
     }
     
     
     ///
     /// Converts a UTF 8 encoded string to a Swift String
     ///
-    /// - Parameter str: String
+    /// - Parameter data: The UTF-8 encoded string to convert
     ///
     /// - Returns: String?
     ///
-    public static func fromUtf8String(_ data: NSData) -> String? {
-        #if os(Linux)
-            let str = NSString(data: data, encoding: NSUTF8StringEncoding)
-        #else
-            let str = NSString(data: data as Data, encoding: String.Encoding.utf8.rawValue)
-        #endif
-        return str!.bridge()
+    public static func fromUtf8String(_ data: Data) -> String? {
+        return String(data: data, encoding: String.Encoding.utf8)
     }
 }
 
