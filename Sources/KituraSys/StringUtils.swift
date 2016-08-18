@@ -27,39 +27,46 @@ import Foundation
 public class StringUtils {
     
     ///
-    /// Converts a Swift string to a UTF encoded Data
+    /// Converts a Swift string to a UTF encoded NSData
     ///
     /// - Parameter str: String
     ///
-    /// - Returns: Data?
+    /// - Returns: NSData?
     ///
-    public static func toUtf8String(_ str: String) -> Data? {
-        return str.data(using: String.Encoding.utf8)
+    public static func toUtf8String(_ str: String) -> NSData? {
+        let nsstr:NSString = str.bridge()
+        #if os(Linux)
+            return nsstr.data(using: String.Encoding.utf8.rawValue)?._bridgeToObjectiveC()
+        #else
+            return nsstr.data(using: String.Encoding.utf8.rawValue) as NSData
+        #endif
     }
     
     
     ///
-    /// Converts a Swift string to a UTF encoded null terminated Data
+    /// Converts a Swift string to a UTF encoded null terminated NSData
     ///
     /// - Parameter str: String
     ///
-    /// - Returns: Data?
+    /// - Returns: NSData?
     ///
-    public static func toNullTerminatedUtf8String(_ str: String) -> Data? {
-        let cString = str.cString(using: String.Encoding.utf8)
-        return cString != nil ? Data(bytes: UnsafePointer<UInt8>(cString!), count: Int(strlen(cString!))+1) : nil
+    public static func toNullTerminatedUtf8String(_ str: String) -> NSData? {
+        let nsstr:NSString = str.bridge()
+        let cString = nsstr.cString(using: String.Encoding.utf8.rawValue)
+        return NSData(bytes: cString, length: Int(strlen(cString!))+1)
     }
     
     
     ///
     /// Converts a UTF 8 encoded string to a Swift String
     ///
-    /// - Parameter data: The UTF-8 encoded string to convert
+    /// - Parameter str: String
     ///
     /// - Returns: String?
     ///
-    public static func fromUtf8String(_ data: Data) -> String? {
-        return String(data: data, encoding: String.Encoding.utf8)
+    public static func fromUtf8String(_ data: NSData) -> String? {
+        let str = NSString(data: Data._unconditionallyBridgeFromObjectiveC(data), encoding: String.Encoding.utf8.rawValue)
+        return str!.bridge()
     }
 }
 
