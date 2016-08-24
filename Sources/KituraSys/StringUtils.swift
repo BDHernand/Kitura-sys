@@ -47,7 +47,9 @@ public class StringUtils {
     ///
     public static func toNullTerminatedUtf8String(_ str: String) -> Data? {
         let cString = str.cString(using: String.Encoding.utf8)
-        return cString != nil ? Data(bytes: UnsafePointer<UInt8>(cString!), count: Int(strlen(cString!))+1) : nil
+        return cString?.withUnsafeBufferPointer() { buffer -> Data? in
+            return buffer.baseAddress != nil ? Data(bytes: buffer.baseAddress!, count: buffer.count) : nil
+        }
     }
     
     
