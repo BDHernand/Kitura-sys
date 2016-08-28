@@ -65,26 +65,3 @@ public class StringUtils {
     }
 }
 
-
-// MARK: String extensions
-//
-// Because that auto bridged Strings to NSStrings do not exist yet for Linux, a bridge method
-// must be called on the String. This bridge method does not exist on Mac OS X. Therefore, these
-// extensions are added to the String structure so that bridge can be called regardless of
-// operating systems.
-//
-#if os(OSX) || os(iOS)
-    
-    public extension String {
-        func bridge() -> NSString {
-            return self as NSString
-        }
-    }
-    
-    public extension NSString {
-        func bridge() -> String {
-            return self as String
-        }
-    }
-    
-#endif
