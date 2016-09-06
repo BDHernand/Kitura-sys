@@ -25,7 +25,7 @@ import Foundation
 // MARK: StringUtils
 
 public class StringUtils {
-    
+
     ///
     /// Converts a Swift string to a UTF encoded Data
     ///
@@ -36,8 +36,8 @@ public class StringUtils {
     public static func toUtf8String(_ str: String) -> Data? {
         return str.data(using: String.Encoding.utf8)
     }
-    
-    
+
+
     ///
     /// Converts a Swift string to a UTF encoded null terminated Data
     ///
@@ -51,8 +51,8 @@ public class StringUtils {
             return buffer.baseAddress != nil ? Data(bytes: buffer.baseAddress!, count: buffer.count) : nil
         }
     }
-    
-    
+
+
     ///
     /// Converts a UTF 8 encoded string to a Swift String
     ///
@@ -64,4 +64,3 @@ public class StringUtils {
         return String(data: data, encoding: String.Encoding.utf8)
     }
 }
-
